@@ -1,0 +1,1536 @@
+.<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DAA Quiz — Adaptive</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #080910;
+    --surface: #0f1118;
+    --surface2: #161924;
+    --surface3: #1e2232;
+    --border: #252840;
+    --border2: #2e3350;
+    --accent: #7c6fff;
+    --accent-glow: #7c6fff40;
+    --accent2: #ff6b6b;
+    --green: #4ecca3;
+    --yellow: #ffd166;
+    --blue: #4db8ff;
+    --text: #e8eaf0;
+    --text2: #b0b4cc;
+    --muted: #5a5f7a;
+    --mono: 'Space Mono', monospace;
+    --sans: 'Syne', sans-serif;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    overflow-x: hidden;
+  }
+
+  /* Animated background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 70% 50% at 15% 15%, #1a1040 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 85% 85%, #0d2020 0%, transparent 55%),
+      radial-gradient(ellipse 40% 30% at 50% 50%, #0c0f1a 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Grid overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(124,111,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(124,111,255,0.03) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 700px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── SCREENS ── */
+  .screen { display: none; }
+  .screen.active { display: block; animation: fadeUp 0.4s cubic-bezier(0.16,1,0.3,1); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 0 0 var(--accent-glow); }
+    50%       { box-shadow: 0 0 0 8px transparent; }
+  }
+
+  @keyframes shimmer {
+    0%   { background-position: -200% center; }
+    100% { background-position: 200% center; }
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+
+  /* ── HEADER ── */
+  .site-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 40px;
+  }
+
+  .logo-mark {
+    width: 40px; height: 40px;
+    background: linear-gradient(135deg, var(--accent), #5a4bcc);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.03em;
+    flex-shrink: 0;
+  }
+
+  .logo-text {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    line-height: 1.4;
+  }
+
+  .logo-text strong {
+    display: block;
+    color: var(--text2);
+    font-size: 12px;
+  }
+
+  .header-badge {
+    margin-left: auto;
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+
+  /* ── HERO ── */
+  .hero { margin-bottom: 32px; }
+
+  .hero-eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .hero-eyebrow::before {
+    content: '';
+    display: block;
+    width: 20px; height: 1px;
+    background: var(--accent);
+  }
+
+  .hero-title {
+    font-size: 52px;
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    margin-bottom: 16px;
+  }
+
+  .hero-title .line1 { display: block; color: var(--text); }
+  .hero-title .line2 {
+    display: block;
+    background: linear-gradient(90deg, var(--accent), var(--blue), var(--green));
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 4s linear infinite;
+  }
+
+  .hero-sub {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .hero-sub-tag {
+    display: flex; align-items: center; gap: 5px;
+  }
+
+  .hero-sub-tag::before {
+    content: '';
+    width: 6px; height: 6px; border-radius: 50%;
+  }
+  .hero-sub-tag.dp::before { background: var(--accent); }
+  .hero-sub-tag.greedy::before { background: var(--accent2); }
+  .hero-sub-tag.graph::before { background: var(--green); }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px;
+    margin-bottom: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border2), transparent);
+  }
+
+  .card-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .card-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── INPUTS ── */
+  .input-wrap {
+    position: relative;
+    margin-bottom: 24px;
+  }
+
+  .field-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  .field-label .req { color: var(--accent2); }
+
+  input[type="text"] {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 13px 16px 13px 42px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  input[type="text"]:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+
+  .input-icon {
+    position: absolute;
+    left: 14px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    font-size: 16px;
+    pointer-events: none;
+  }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 13px 28px;
+    border-radius: 10px;
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: transform 0.15s, opacity 0.15s, box-shadow 0.2s;
+    letter-spacing: 0.02em;
+  }
+
+  .btn:hover { transform: translateY(-2px); }
+  .btn:active { transform: translateY(0); }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), #6456e0);
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(124,111,255,0.3);
+  }
+  .btn-primary:hover { box-shadow: 0 6px 28px rgba(124,111,255,0.5); }
+
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--border2);
+    color: var(--text2);
+  }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+  .btn-full { width: 100%; }
+  .btn + .btn { margin-top: 10px; }
+
+  .btn-arrow { font-size: 16px; transition: transform 0.2s; }
+  .btn:hover .btn-arrow { transform: translateX(4px); }
+
+  /* ── CHIPS ── */
+  .chips-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+  .chip {
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--muted);
+    transition: all 0.18s;
+    position: relative;
+  }
+
+  .chip:hover { border-color: var(--border2); color: var(--text2); }
+
+  .chip.selected {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(124,111,255,0.08);
+    box-shadow: inset 0 0 0 1px rgba(124,111,255,0.2);
+  }
+
+  /* ── FEATURE ROW ── */
+  .feature-row {
+    display: flex; gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .feature-pill {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+  }
+
+  .feature-pill-icon { font-size: 18px; margin-bottom: 4px; }
+  .feature-pill-label { font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 0.08em; }
+
+  /* ── MENU ITEMS ── */
+  .menu-item {
+    display: flex; align-items: center; gap: 16px;
+    padding: 16px 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    transition: border-color 0.18s, background 0.18s, transform 0.18s;
+    position: relative; overflow: hidden;
+  }
+
+  .menu-item::after {
+    content: '→';
+    position: absolute; right: 18px;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 14px;
+    transition: transform 0.2s, color 0.2s;
+  }
+
+  .menu-item:hover {
+    border-color: var(--accent);
+    background: rgba(124,111,255,0.04);
+    transform: translateY(-1px);
+  }
+  .menu-item:hover::after { transform: translateX(4px); color: var(--accent); }
+
+  .menu-icon {
+    width: 42px; height: 42px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .menu-title { font-weight: 700; font-size: 15px; }
+  .menu-desc  { font-size: 12px; color: var(--muted); margin-top: 2px; font-family: var(--mono); }
+
+  /* ── HUD ── */
+  .hud {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .hud-pill {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-align: center;
+  }
+
+  .hud-pill .hud-val {
+    display: block;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 2px;
+    color: var(--text);
+  }
+
+  .hud-pill.rating .hud-val { color: var(--accent); }
+  .hud-pill.score  .hud-val { color: var(--green); }
+  .hud-pill.streak .hud-val { color: var(--yellow); }
+
+  /* ── PROGRESS ── */
+  .progress-container {
+    margin-bottom: 20px;
+  }
+
+  .progress-info {
+    display: flex; justify-content: space-between;
+    font-family: var(--mono); font-size: 10px;
+    color: var(--muted); margin-bottom: 8px;
+    letter-spacing: 0.08em;
+  }
+
+  .progress-wrap {
+    background: var(--surface2);
+    border-radius: 99px;
+    height: 5px;
+    overflow: visible;
+    position: relative;
+  }
+
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--blue));
+    border-radius: 99px;
+    transition: width 0.5s cubic-bezier(0.16,1,0.3,1);
+    position: relative;
+  }
+
+  .progress-bar::after {
+    content: '';
+    position: absolute;
+    right: -1px; top: 50%;
+    transform: translateY(-50%);
+    width: 8px; height: 8px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 6px var(--accent);
+    transition: opacity 0.3s;
+  }
+
+  /* ── QUESTION CARD ── */
+  #questionCard {
+    padding: 0;
+  }
+
+  .q-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 12px;
+  }
+
+  .q-topic {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    padding: 4px 10px;
+    border-radius: 5px;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+  .topic-dp     { background: rgba(124,111,255,0.12); color: var(--accent); border: 1px solid rgba(124,111,255,0.25); }
+  .topic-greedy { background: rgba(255,107,107,0.12); color: var(--accent2); border: 1px solid rgba(255,107,107,0.25); }
+  .topic-graph  { background: rgba(78,204,163,0.12);  color: var(--green);   border: 1px solid rgba(78,204,163,0.25); }
+
+  .diff-wrap {
+    display: flex; align-items: center; gap: 6px;
+    margin-left: auto;
+  }
+
+  .diff-label {
+    font-family: var(--mono); font-size: 10px;
+    color: var(--muted); letter-spacing: 0.08em;
+  }
+
+  .diff-dots { display: flex; gap: 4px; }
+  .diff-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--border2);
+    transition: background 0.2s;
+  }
+  .diff-dot.on { background: var(--yellow); box-shadow: 0 0 4px rgba(255,209,102,0.5); }
+
+  .q-body {
+    padding: 24px;
+  }
+
+  .q-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    margin-bottom: 10px;
+  }
+
+  .q-text {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.6;
+    margin-bottom: 24px;
+    color: var(--text);
+  }
+
+  /* ── OPTIONS ── */
+  .options { display: flex; flex-direction: column; gap: 9px; margin-bottom: 20px; }
+  .option {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: border-color 0.15s, background 0.15s, transform 0.12s;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text2);
+  }
+
+  .option:hover:not(.disabled) {
+    border-color: var(--accent);
+    background: rgba(124,111,255,0.06);
+    transform: translateX(3px);
+    color: var(--text);
+  }
+
+  .option-key {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    background: var(--surface3);
+    border: 1px solid var(--border2);
+    width: 28px; height: 28px;
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+
+  .option.correct {
+    border-color: var(--green);
+    background: rgba(78,204,163,0.08);
+    color: var(--text);
+    transform: none;
+  }
+  .option.correct .option-key {
+    background: var(--green);
+    border-color: var(--green);
+    color: #000;
+  }
+
+  .option.wrong {
+    border-color: var(--accent2);
+    background: rgba(255,107,107,0.08);
+    color: var(--text);
+    transform: none;
+  }
+  .option.wrong .option-key {
+    background: var(--accent2);
+    border-color: var(--accent2);
+    color: #fff;
+  }
+
+  .option.disabled { cursor: default; pointer-events: none; }
+
+  /* ── EXPLANATION ── */
+  .explanation {
+    display: none;
+    background: var(--surface2);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.65;
+    margin-bottom: 20px;
+    border-left: 3px solid var(--accent);
+  }
+  .explanation.show { display: block; animation: fadeUp 0.3s ease; }
+  .explanation.correct-exp { border-left-color: var(--green); }
+  .explanation.wrong-exp   { border-left-color: var(--accent2); }
+
+  .exp-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-family: var(--mono); font-size: 11px; font-weight: 700;
+    padding: 2px 8px; border-radius: 4px;
+    margin-right: 6px;
+  }
+  .exp-badge.correct { background: rgba(78,204,163,0.15); color: var(--green); }
+  .exp-badge.wrong   { background: rgba(255,107,107,0.15); color: var(--accent2); }
+
+  /* ── NEXT BTN ── */
+  #nextBtn { display: none; margin: 0 24px 24px; }
+  #nextBtn.show { display: flex; }
+
+  /* ── RESULTS ── */
+  .result-hero {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 40px 32px 32px;
+    text-align: center;
+    margin-bottom: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .result-hero::before {
+    content: '';
+    position: absolute;
+    top: -40px; left: 50%;
+    transform: translateX(-50%);
+    width: 160px; height: 160px;
+    background: radial-gradient(circle, rgba(124,111,255,0.2) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .result-name {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .result-score {
+    font-size: 80px;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1;
+    font-family: var(--mono);
+    letter-spacing: -0.03em;
+    position: relative;
+  }
+
+  .result-label {
+    font-size: 13px;
+    color: var(--muted);
+    font-family: var(--mono);
+    margin-top: 6px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .result-rating-wrap {
+    margin-top: 18px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+
+  .result-rating {
+    display: inline-block;
+    background: rgba(124,111,255,0.1);
+    border: 1px solid rgba(124,111,255,0.3);
+    border-radius: 99px;
+    padding: 6px 18px;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--accent);
+  }
+
+  .performance-tag {
+    display: inline-block;
+    border-radius: 99px;
+    padding: 6px 16px;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .stat-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 12px;
+    text-align: center;
+    position: relative; overflow: hidden;
+  }
+
+  .stat-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
+  }
+
+  .stat-box.s1::before { background: linear-gradient(90deg, var(--accent), transparent); }
+  .stat-box.s2::before { background: linear-gradient(90deg, var(--yellow), transparent); }
+  .stat-box.s3::before { background: linear-gradient(90deg, var(--green), transparent); }
+
+  .stat-val { font-size: 28px; font-weight: 800; font-family: var(--mono); color: var(--text); }
+  .stat-key { font-size: 10px; color: var(--muted); margin-top: 4px; font-family: var(--mono); letter-spacing: 0.1em; text-transform: uppercase; }
+
+  .topic-breakdown {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 12px;
+  }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1; height: 1px;
+    background: var(--border);
+  }
+
+  .topic-row  { margin-bottom: 16px; }
+  .topic-row:last-child { margin-bottom: 0; }
+
+  .topic-row-label {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 13px; color: var(--text2); margin-bottom: 8px;
+    font-family: var(--mono);
+  }
+
+  .topic-pct {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  .bar-bg {
+    background: var(--surface2);
+    border-radius: 99px;
+    height: 7px;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.8s cubic-bezier(0.16,1,0.3,1);
+    animation: barIn 0.8s cubic-bezier(0.16,1,0.3,1) forwards;
+  }
+
+  @keyframes barIn {
+    from { width: 0 !important; }
+  }
+
+  /* ── LEADERBOARD ── */
+  .lb-header-area {
+    margin-bottom: 28px;
+  }
+
+  .lb-table {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+
+  .lb-thead {
+    display: grid;
+    grid-template-columns: 52px 1fr 80px 70px;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: var(--surface2);
+  }
+
+  .lb-row {
+    display: grid;
+    grid-template-columns: 52px 1fr 80px 70px;
+    align-items: center;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 13px;
+    transition: background 0.15s;
+  }
+
+  .lb-row:last-child { border-bottom: none; }
+  .lb-row:hover { background: var(--surface2); }
+
+  .lb-row.top1 { background: rgba(255,209,102,0.04); }
+  .lb-row.top2 { background: rgba(192,192,192,0.03); }
+  .lb-row.top3 { background: rgba(200,132,74,0.03); }
+
+  .lb-rank { font-weight: 700; font-size: 14px; }
+  .lb-rank.gold   { color: var(--yellow); }
+  .lb-rank.silver { color: #a8aabe; }
+  .lb-rank.bronze { color: #c8844a; }
+  .lb-rank.other  { color: var(--muted); font-size: 12px; }
+
+  .lb-name { color: var(--text); font-weight: 700; }
+  .lb-rating { color: var(--accent); font-weight: 700; }
+  .lb-score  { color: var(--muted); font-size: 11px; }
+
+  .lb-empty {
+    padding: 48px 20px;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+  }
+
+  /* ── DIVIDER ── */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 20px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    z-index: 999;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.35s cubic-bezier(0.16,1,0.3,1);
+    max-width: 280px;
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  .toast.show {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .toast-icon { font-size: 18px; flex-shrink: 0; }
+
+  /* ── STREAK BADGE ── */
+  .streak-flash {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    background: rgba(255,209,102,0.15);
+    border: 2px solid var(--yellow);
+    border-radius: 16px;
+    padding: 16px 28px;
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--yellow);
+    font-weight: 700;
+    z-index: 100;
+    pointer-events: none;
+    letter-spacing: 0.1em;
+    text-align: center;
+    backdrop-filter: blur(8px);
+    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  }
+
+  .streak-flash.show {
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="streak-flash" id="streakFlash">🔥 Streak!</div>
+
+<div class="container">
+
+  <!-- ══ SCREEN: HOME ══ -->
+  <div class="screen active" id="screen-home">
+    <div class="site-header">
+      <div class="logo-mark">DAA</div>
+      <div class="logo-text">
+        <strong>Algorithm Quiz Engine</strong>
+        Adaptive · ELO-Rated
+      </div>
+      <div class="header-badge">v2.0</div>
+    </div>
+
+    <div class="hero">
+      <div class="hero-eyebrow">Adaptive difficulty</div>
+      <h1 class="hero-title">
+        <span class="line1">Algorithm</span>
+        <span class="line2">Quiz</span>
+      </h1>
+      <div class="hero-sub">
+        <span class="hero-sub-tag dp">Dynamic Programming</span>
+        <span class="hero-sub-tag greedy">Greedy Algorithms</span>
+        <span class="hero-sub-tag graph">Graph Theory</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Session Setup</div>
+
+      <div class="field-label">Player name <span class="req">*</span></div>
+      <div class="input-wrap">
+        <div class="input-icon">◈</div>
+        <input type="text" id="playerName" placeholder="Enter your name…" maxlength="20" />
+      </div>
+
+      <div class="chips-label">Questions per session</div>
+      <div class="chips" id="qCountChips">
+        <div class="chip" data-val="5">5</div>
+        <div class="chip selected" data-val="10">10</div>
+        <div class="chip" data-val="15">15</div>
+        <div class="chip" data-val="20">20</div>
+      </div>
+
+      <div class="feature-row">
+        <div class="feature-pill">
+          <div class="feature-pill-icon">🧠</div>
+          <div class="feature-pill-label">Adaptive</div>
+        </div>
+        <div class="feature-pill">
+          <div class="feature-pill-icon">📊</div>
+          <div class="feature-pill-label">ELO Rated</div>
+        </div>
+        <div class="feature-pill">
+          <div class="feature-pill-icon">🎯</div>
+          <div class="feature-pill-label">33 Questions</div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-full" onclick="startGame()">
+        Start Quiz <span class="btn-arrow">→</span>
+      </button>
+    </div>
+
+    <div class="menu-item" onclick="showLeaderboard()">
+      <div class="menu-icon">🏆</div>
+      <div>
+        <div class="menu-title">Leaderboard</div>
+        <div class="menu-desc">Top players ranked by ELO rating</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN: QUIZ ══ -->
+  <div class="screen" id="screen-quiz">
+    <div class="hud">
+      <div class="hud-pill rating">
+        <span class="hud-val" id="hudRating">1200</span>
+        ELO
+      </div>
+      <div class="hud-pill score">
+        <span class="hud-val" id="hudScore">0/0</span>
+        SCORE
+      </div>
+      <div class="hud-pill streak">
+        <span class="hud-val" id="hudStreak">🔥 0</span>
+        STREAK
+      </div>
+      <div class="hud-pill">
+        <span class="hud-val" id="hudQNum">1/10</span>
+        QUESTION
+      </div>
+    </div>
+
+    <div class="progress-container">
+      <div class="progress-info">
+        <span>Progress</span>
+        <span id="progressLabel">0%</span>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-bar" id="progressBar" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="card" id="questionCard">
+      <div class="q-header">
+        <div class="q-topic" id="qTopic">DP</div>
+        <div class="diff-wrap">
+          <div class="diff-label">DIFF</div>
+          <div class="diff-dots" id="diffDots"></div>
+        </div>
+      </div>
+      <div class="q-body">
+        <div class="q-num" id="qNumLabel">QUESTION 1 OF 10</div>
+        <div class="q-text" id="qText"></div>
+        <div class="options" id="options"></div>
+        <div class="explanation" id="explanation"></div>
+      </div>
+      <button class="btn btn-primary btn-full" id="nextBtn" onclick="nextQuestion()">
+        Next Question <span class="btn-arrow">→</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN: RESULTS ══ -->
+  <div class="screen" id="screen-results">
+    <div class="result-hero">
+      <div class="result-name" id="resultName">Player</div>
+      <div class="result-score" id="finalScore">0/0</div>
+      <div class="result-label">Final Score</div>
+      <div class="result-rating-wrap">
+        <div class="result-rating" id="finalRating">ELO 1200</div>
+        <div class="performance-tag" id="perfTag"></div>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-box s1">
+        <div class="stat-val" id="statAcc">0%</div>
+        <div class="stat-key">Accuracy</div>
+      </div>
+      <div class="stat-box s2">
+        <div class="stat-val" id="statStreak">0</div>
+        <div class="stat-key">Best Streak</div>
+      </div>
+      <div class="stat-box s3">
+        <div class="stat-val" id="statLevel">—</div>
+        <div class="stat-key">Level</div>
+      </div>
+    </div>
+
+    <div class="topic-breakdown">
+      <div class="section-label">Topic Breakdown</div>
+      <div id="topicBars"></div>
+    </div>
+
+    <button class="btn btn-primary btn-full" onclick="showScreen('screen-home')">
+      Play Again <span class="btn-arrow">→</span>
+    </button>
+    <button class="btn btn-ghost btn-full" onclick="showLeaderboard()">View Leaderboard</button>
+  </div>
+
+  <!-- ══ SCREEN: LEADERBOARD ══ -->
+  <div class="screen" id="screen-lb">
+    <div class="lb-header-area">
+      <div class="site-header">
+        <div class="logo-mark">🏆</div>
+        <div class="logo-text">
+          <strong>Hall of Fame</strong>
+          Ranked by ELO rating
+        </div>
+      </div>
+    </div>
+
+    <div class="lb-table">
+      <div class="lb-thead">
+        <div>Rank</div>
+        <div>Player</div>
+        <div>ELO</div>
+        <div>Score</div>
+      </div>
+      <div id="lbContent"></div>
+    </div>
+
+    <button class="btn btn-ghost btn-full" onclick="showScreen('screen-home')">← Back to Home</button>
+  </div>
+
+</div>
+
+<!-- Toast notification -->
+<div class="toast" id="toast">
+  <div class="toast-icon" id="toastIcon">✓</div>
+  <div id="toastMsg">Nice!</div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+//  QUESTION BANK (unchanged)
+// ══════════════════════════════════════════════
+const BANK = [
+  // ── DYNAMIC PROGRAMMING ──
+  {id:0,topic:'DP',diff:1,text:'What technique does Dynamic Programming use to avoid redundant computation?',correct:'Memoization / Tabulation',wrong:['Recursion without storage','Greedy selection','Divide without overlap'],explain:'DP stores solutions to subproblems so they are never recomputed.'},
+  {id:1,topic:'DP',diff:1,text:'What is the time complexity of the naive recursive Fibonacci?',correct:'O(2ⁿ)',wrong:['O(n)','O(n log n)','O(n²)'],explain:'Each call branches into two more, leading to exponential calls.'},
+  {id:2,topic:'DP',diff:1,text:'Which property MUST a problem have for DP to apply?',correct:'Optimal substructure',wrong:['NP-completeness','Greedy choice property','Sorted input'],explain:'DP requires that the optimal solution can be built from optimal solutions to subproblems.'},
+  {id:3,topic:'DP',diff:1,text:'What is the space-optimized complexity of the Fibonacci DP solution?',correct:'O(1)',wrong:['O(n)','O(log n)','O(n²)'],explain:'We only need the previous two values at any point.'},
+  {id:4,topic:'DP',diff:2,text:'What is the time complexity of the 0/1 Knapsack DP solution?',correct:'O(nW)',wrong:['O(n log n)','O(n²)','O(2ⁿ)'],explain:'We fill an n × W table, each cell in O(1), giving O(nW) total.'},
+  {id:5,topic:'DP',diff:2,text:'In Longest Common Subsequence (LCS), if characters match at (i,j), the recurrence is?',correct:'dp[i][j] = dp[i-1][j-1] + 1',wrong:['dp[i][j] = dp[i][j-1] + 1','dp[i][j] = max(dp[i-1][j], dp[i][j-1])','dp[i][j] = dp[i-1][j] + 1'],explain:'A match extends the LCS of the strings without those characters.'},
+  {id:6,topic:'DP',diff:2,text:'Matrix Chain Multiplication DP has which time complexity?',correct:'O(n³)',wrong:['O(n²)','O(n log n)','O(2ⁿ)'],explain:'Three nested loops: chain length, start index, and split point k.'},
+  {id:7,topic:'DP',diff:2,text:'Which of these is NOT a classic DP problem?',correct:'Minimum Spanning Tree',wrong:['Edit Distance','Coin Change','Longest Palindromic Subsequence'],explain:'MST is solved with greedy (Prim\'s/Kruskal\'s), not DP.'},
+  {id:8,topic:'DP',diff:3,text:'In the Edit Distance problem, what does dp[i][j] represent?',correct:'Min operations to convert first i chars to first j chars',wrong:['Max matching chars','Number of common chars','Length of LCS'],explain:'dp[i][j] counts insert, delete, replace needed for the prefix transformation.'},
+  {id:9,topic:'DP',diff:3,text:'What is the recurrence for Coin Change (min coins) when coin c ≤ amount a?',correct:'dp[a] = min(dp[a], dp[a-c] + 1)',wrong:['dp[a] = max(dp[a], dp[a-c] + 1)','dp[a] = dp[a-c] + c','dp[a] = dp[a] + dp[c]'],explain:'We take coin c and add 1 to the min coins needed for (a-c).'},
+  {id:10,topic:'DP',diff:3,text:'Bellman-Ford is essentially a DP over what structure?',correct:'Number of edges used (relaxation rounds)',wrong:['Vertices sorted by distance','BFS levels','DFS timestamps'],explain:'Each round k allows paths using at most k edges, building up the solution.'},
+
+  // ── GREEDY ──
+  {id:11,topic:'GREEDY',diff:1,text:'What is the core idea of a greedy algorithm?',correct:'Make the locally optimal choice at each step',wrong:['Try all possibilities','Split into equal halves','Use memoization'],explain:'Greedy picks the best option available right now, hoping for a global optimum.'},
+  {id:12,topic:'GREEDY',diff:1,text:'Which of these is a correct greedy algorithm?',correct:'Activity Selection Problem',wrong:['0/1 Knapsack','Edit Distance','Longest Common Subsequence'],explain:'Activity selection greedily picks the activity finishing earliest.'},
+  {id:13,topic:'GREEDY',diff:1,text:'Greedy works for Fractional Knapsack but NOT for 0/1 Knapsack. Why?',correct:"Items can't be split in 0/1 Knapsack, breaking greedy optimality",wrong:['Fractional Knapsack has more items','0/1 Knapsack is easier','Greedy is slower'],explain:'Without fractions, a greedy pick may block a better combination.'},
+  {id:14,topic:'GREEDY',diff:1,text:'What does Huffman Coding minimize?',correct:'Total bits used for encoding',wrong:['Number of unique characters','Depth of the tree','Number of nodes'],explain:'Huffman assigns shorter codes to frequent chars, minimizing total encoding length.'},
+  {id:15,topic:'GREEDY',diff:2,text:'What data structure powers Huffman Coding construction?',correct:'Min-heap (priority queue)',wrong:['Stack','Max-heap','Hash map'],explain:'We repeatedly extract two minimum-frequency nodes to build the tree.'},
+  {id:16,topic:'GREEDY',diff:2,text:'Time complexity of Activity Selection (pre-sorted input)?',correct:'O(n)',wrong:['O(n log n)','O(n²)','O(log n)'],explain:'A single linear scan through activities sorted by finish time suffices.'},
+  {id:17,topic:'GREEDY',diff:2,text:'In Fractional Knapsack, items are sorted by?',correct:'Value-to-weight ratio (descending)',wrong:['Weight ascending','Value descending','Weight descending'],explain:'Taking the highest value per unit weight first is greedy-optimal.'},
+  {id:18,topic:'GREEDY',diff:2,text:'Greedy Coin Change gives wrong answer for coins {1,3,4}, target=6. Why?',correct:'Greedy picks 4+1+1=3 coins; optimal is 3+3=2 coins',wrong:['Greedy always works for any coin set','The target is too small','Sorting order is wrong'],explain:'Greedy coin change only works for canonical coin systems like standard denominations.'},
+  {id:19,topic:'GREEDY',diff:3,text:'Which property guarantees greedy gives the global optimum?',correct:'Greedy choice property + optimal substructure',wrong:['Overlapping subproblems','Polynomial time complexity','NP-hardness'],explain:'Both properties together let us prove the greedy solution is optimal.'},
+  {id:20,topic:'GREEDY',diff:3,text:"Kruskal's MST algorithm is greedy over?",correct:'Edges sorted by weight, skipping those that form cycles',wrong:['Vertices sorted by degree','DFS order of vertices','BFS levels'],explain:"Kruskal greedily adds the cheapest safe edge using Union-Find to detect cycles."},
+  {id:21,topic:'GREEDY',diff:3,text:"What is the time complexity of Kruskal's algorithm?",correct:'O(E log E)',wrong:['O(V²)','O(E log V)','O(V log V)'],explain:'Dominated by sorting edges; Union-Find operations are nearly O(1) amortized.'},
+
+  // ── GRAPH ──
+  {id:22,topic:'GRAPH',diff:1,text:'BFS uses which data structure?',correct:'Queue',wrong:['Stack','Priority queue','Deque'],explain:'BFS explores level by level using a FIFO queue.'},
+  {id:23,topic:'GRAPH',diff:1,text:'DFS uses which data structure (or technique)?',correct:'Stack (or recursion)',wrong:['Queue','Priority queue','Hash map'],explain:'DFS goes deep first; recursion implicitly uses the call stack.'},
+  {id:24,topic:'GRAPH',diff:1,text:'What does BFS find in an unweighted graph?',correct:'Shortest path (by number of edges)',wrong:['Minimum spanning tree','Topological order','Strongly connected components'],explain:'BFS visits nodes in order of edge distance from the source.'},
+  {id:25,topic:'GRAPH',diff:1,text:'Time complexity of BFS/DFS on a graph with V vertices and E edges?',correct:'O(V + E)',wrong:['O(V²)','O(E log V)','O(V log E)'],explain:'Each vertex and edge is visited exactly once.'},
+  {id:26,topic:'GRAPH',diff:2,text:"Dijkstra's algorithm fails when the graph has?",correct:'Negative weight edges',wrong:['Disconnected components','Self-loops','Cycles'],explain:'Negative edges can invalidate already-settled shortest path estimates.'},
+  {id:27,topic:'GRAPH',diff:2,text:"Time complexity of Dijkstra's with a binary min-heap?",correct:'O((V + E) log V)',wrong:['O(V²)','O(E log E)','O(V log E)'],explain:'Each vertex extracted once O(V log V) and each edge relaxed O(E log V).'},
+  {id:28,topic:'GRAPH',diff:2,text:'Which algorithm detects negative weight cycles?',correct:'Bellman-Ford',wrong:['Dijkstra','Floyd-Warshall',"Prim's"],explain:'Bellman-Ford detects if a V-th relaxation still reduces a distance.'},
+  {id:29,topic:'GRAPH',diff:2,text:'Topological sorting applies to which type of graph?',correct:'Directed Acyclic Graph (DAG)',wrong:['Undirected graph','Graph with negative edges','Complete graph'],explain:'A topological order only exists when there are no cycles.'},
+  {id:30,topic:'GRAPH',diff:3,text:'What is the time complexity of Bellman-Ford?',correct:'O(VE)',wrong:['O(V + E)','O(E log V)','O(V² log V)'],explain:'V-1 relaxation rounds, each scanning all E edges.'},
+  {id:31,topic:'GRAPH',diff:3,text:"In Dijkstra's, why can we safely finalize a vertex when popped from the heap?",correct:'All future paths through unvisited nodes can only be longer (no negatives)',wrong:['The heap is sorted by arrival time','All edges are already relaxed','The vertex has no more neighbors'],explain:'With non-negative weights, the shortest known distance cannot decrease further.'},
+  {id:32,topic:'GRAPH',diff:3,text:'Which graph representation is better for sparse graphs?',correct:'Adjacency list — O(V + E) space',wrong:['Adjacency matrix — O(V²) space','Edge list — O(E log E)','Incidence matrix — O(VE)'],explain:'Adjacency lists only store existing edges, efficient when E << V².'},
+];
+
+// ══════════════════════════════════════════════
+//  PLAYER STATE (unchanged)
+// ══════════════════════════════════════════════
+let player = {
+  name: '', rating: 1200, score: 0, total: 0,
+  streak: 0, bestStreak: 0,
+  topicCorrect: {DP:0,GREEDY:0,GRAPH:0},
+  topicTotal:   {DP:0,GREEDY:0,GRAPH:0},
+};
+
+let session = {
+  qTotal: 10, qDone: 0,
+  askedIds: [], currentQ: null,
+  choices: [], correctIdx: 0,
+};
+
+// ══════════════════════════════════════════════
+//  ELO ENGINE (unchanged)
+// ══════════════════════════════════════════════
+function updateELO(diff, correct) {
+  const diffRating = diff === 1 ? 1000 : diff === 2 ? 1200 : 1500;
+  const E = 1 / (1 + Math.pow(10, (diffRating - player.rating) / 400));
+  const K = 32;
+  player.rating += Math.round(K * ((correct ? 1 : 0) - E));
+  player.rating = Math.max(600, Math.min(2200, player.rating));
+  player.total++;
+  if (correct) { player.score++; player.streak++; player.bestStreak = Math.max(player.bestStreak, player.streak); }
+  else player.streak = 0;
+}
+
+function currentLevel() {
+  if (player.rating < 1100) return 1;
+  if (player.rating < 1400) return 2;
+  return 3;
+}
+
+// ══════════════════════════════════════════════
+//  ADAPTIVE QUESTION SELECTOR (unchanged)
+// ══════════════════════════════════════════════
+function selectQuestion() {
+  const topics = ['DP','GREEDY','GRAPH'];
+  topics.sort((a, b) => {
+    const ta = player.topicTotal[a], tb = player.topicTotal[b];
+    if (ta === 0 && tb === 0) return 0;
+    if (ta === 0) return -1;
+    if (tb === 0) return 1;
+    return (player.topicCorrect[a]/ta) - (player.topicCorrect[b]/tb);
+  });
+  const target = currentLevel();
+  for (let offset = 0; offset <= 2; offset++) {
+    const diff = Math.max(1, Math.min(3, target - offset));
+    for (const topic of topics) {
+      const candidates = BANK.filter(q =>
+        q.topic === topic && q.diff === diff && !session.askedIds.includes(q.id)
+      );
+      if (candidates.length > 0)
+        return candidates[Math.floor(Math.random() * candidates.length)];
+    }
+  }
+  session.askedIds = [];
+  return BANK[Math.floor(Math.random() * BANK.length)];
+}
+
+// ══════════════════════════════════════════════
+//  GAME FLOW (unchanged logic, enhanced UI)
+// ══════════════════════════════════════════════
+function startGame() {
+  const nameEl = document.getElementById('playerName');
+  const name = nameEl.value.trim();
+  if (!name) {
+    nameEl.focus();
+    nameEl.style.borderColor = 'var(--accent2)';
+    nameEl.style.boxShadow = '0 0 0 3px rgba(255,107,107,0.2)';
+    showToast('⚠️', 'Please enter your name');
+    return;
+  }
+
+  player = {
+    name, rating: 1200, score: 0, total: 0,
+    streak: 0, bestStreak: 0,
+    topicCorrect: {DP:0,GREEDY:0,GRAPH:0},
+    topicTotal:   {DP:0,GREEDY:0,GRAPH:0},
+  };
+  session.qTotal   = parseInt(document.querySelector('.chip.selected').dataset.val);
+  session.qDone    = 0;
+  session.askedIds = [];
+
+  showScreen('screen-quiz');
+  loadQuestion();
+}
+
+function loadQuestion() {
+  const q = selectQuestion();
+  session.currentQ = q;
+  session.askedIds.push(q.id);
+
+  const choices = [...q.wrong, q.correct].sort(() => Math.random() - 0.5);
+  session.choices = choices;
+  session.correctIdx = choices.indexOf(q.correct);
+
+  // Update HUD
+  document.getElementById('hudRating').textContent = player.rating;
+  document.getElementById('hudScore').textContent  = `${player.score}/${player.total}`;
+  document.getElementById('hudStreak').textContent = `🔥 ${player.streak}`;
+  document.getElementById('hudQNum').textContent   = `${session.qDone+1}/${session.qTotal}`;
+
+  // Progress
+  const pct = (session.qDone / session.qTotal) * 100;
+  document.getElementById('progressBar').style.width = `${pct}%`;
+  document.getElementById('progressLabel').textContent = `${Math.round(pct)}%`;
+
+  // Question number label
+  document.getElementById('qNumLabel').textContent = `QUESTION ${session.qDone+1} OF ${session.qTotal}`;
+
+  // Topic badge
+  const topicEl = document.getElementById('qTopic');
+  topicEl.textContent = q.topic === 'GREEDY' ? 'GREEDY' : q.topic;
+  topicEl.className = 'q-topic ' + (q.topic==='DP'?'topic-dp':q.topic==='GREEDY'?'topic-greedy':'topic-graph');
+
+  // Difficulty dots
+  const dots = document.getElementById('diffDots');
+  dots.innerHTML = [1,2,3].map(i => `<div class="diff-dot ${i<=q.diff?'on':''}"></div>`).join('');
+
+  // Question text
+  document.getElementById('qText').textContent = q.text;
+
+  // Options
+  const optEl = document.getElementById('options');
+  optEl.innerHTML = choices.map((c, i) =>
+    `<div class="option" onclick="answer(${i})" id="opt${i}">
+      <div class="option-key">${'ABCD'[i]}</div>
+      <div>${c}</div>
+    </div>`
+  ).join('');
+
+  // Reset explanation + next btn
+  const exp = document.getElementById('explanation');
+  exp.className = 'explanation';
+  exp.innerHTML = '';
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.className = 'btn btn-primary btn-full';
+  nextBtn.innerHTML = 'Next Question <span class="btn-arrow">→</span>';
+}
+
+function answer(idx) {
+  const q = session.currentQ;
+  const correct = idx === session.correctIdx;
+  const prevStreak = player.streak;
+
+  updateELO(q.diff, correct);
+  player.topicTotal[q.topic]++;
+  if (correct) player.topicCorrect[q.topic]++;
+
+  // Color options
+  document.querySelectorAll('.option').forEach((el, i) => {
+    el.classList.add('disabled');
+    if (i === session.correctIdx) el.classList.add('correct');
+    else if (i === idx && !correct) el.classList.add('wrong');
+  });
+
+  // Show explanation
+  const exp = document.getElementById('explanation');
+  const badge = correct
+    ? '<span class="exp-badge correct">✓ Correct</span>'
+    : '<span class="exp-badge wrong">✗ Wrong</span>';
+  exp.innerHTML = `${badge} ${q.explain}`;
+  exp.className = 'explanation show ' + (correct ? 'correct-exp' : 'wrong-exp');
+
+  // Update HUD
+  document.getElementById('hudRating').textContent = player.rating;
+  document.getElementById('hudScore').textContent  = `${player.score}/${player.total}`;
+  document.getElementById('hudStreak').textContent = `🔥 ${player.streak}`;
+
+  // Toast + streak flash
+  if (correct) {
+    if (player.streak >= 3 && player.streak > prevStreak) {
+      showStreakFlash(`🔥 ${player.streak} in a row!`);
+    } else {
+      showToast('✓', getRatingToast());
+    }
+  } else {
+    showToast('✗', 'Better luck next time!');
+  }
+
+  // Show next button
+  session.qDone++;
+  const nextBtn = document.getElementById('nextBtn');
+  const isLast = session.qDone >= session.qTotal;
+  nextBtn.innerHTML = isLast
+    ? 'See Results <span class="btn-arrow">→</span>'
+    : 'Next Question <span class="btn-arrow">→</span>';
+  nextBtn.className = 'btn btn-primary btn-full show';
+}
+
+function getRatingToast() {
+  const msgs = ['Nice one!', 'Keep it up!', 'Sharp mind!', 'Correct!', 'Well done!'];
+  return msgs[Math.floor(Math.random() * msgs.length)];
+}
+
+function nextQuestion() {
+  if (session.qDone >= session.qTotal) {
+    showResults();
+  } else {
+    loadQuestion();
+  }
+}
+
+// ══════════════════════════════════════════════
+//  RESULTS (unchanged logic)
+// ══════════════════════════════════════════════
+function showResults() {
+  saveLeaderboard();
+  showScreen('screen-results');
+
+  document.getElementById('resultName').textContent = player.name.toUpperCase();
+  document.getElementById('finalScore').textContent = `${player.score}/${player.total}`;
+  document.getElementById('finalRating').textContent = `ELO ${player.rating}`;
+
+  const acc = player.total > 0 ? Math.round(100*player.score/player.total) : 0;
+  document.getElementById('statAcc').textContent = acc + '%';
+  document.getElementById('statStreak').textContent = player.bestStreak;
+
+  const lvl = currentLevel();
+  document.getElementById('statLevel').textContent = lvl===1?'EASY':lvl===2?'MED':'HARD';
+
+  // Performance tag
+  const perfEl = document.getElementById('perfTag');
+  if (acc >= 80) {
+    perfEl.textContent = '🏆 Excellent';
+    perfEl.style.cssText = 'background:rgba(255,209,102,0.12);border:1px solid rgba(255,209,102,0.3);color:var(--yellow)';
+  } else if (acc >= 50) {
+    perfEl.textContent = '👍 Good';
+    perfEl.style.cssText = 'background:rgba(78,204,163,0.12);border:1px solid rgba(78,204,163,0.3);color:var(--green)';
+  } else {
+    perfEl.textContent = '📚 Keep studying';
+    perfEl.style.cssText = 'background:rgba(124,111,255,0.12);border:1px solid rgba(124,111,255,0.3);color:var(--accent)';
+  }
+
+  const colors = {DP:'var(--accent)',GREEDY:'var(--accent2)',GRAPH:'var(--green)'};
+  const bars = document.getElementById('topicBars');
+  bars.innerHTML = ['DP','GREEDY','GRAPH'].map(t => {
+    const tot = player.topicTotal[t];
+    const cor = player.topicCorrect[t];
+    const pct = tot > 0 ? Math.round(100*cor/tot) : 0;
+    const label = t==='GREEDY'?'Greedy':t==='DP'?'Dynamic Programming':'Graph Algorithms';
+    return `<div class="topic-row">
+      <div class="topic-row-label">
+        <span>${label}</span>
+        <span class="topic-pct">${cor}/${tot} · ${pct}%</span>
+      </div>
+      <div class="bar-bg">
+        <div class="bar-fill" style="width:${pct}%;background:${colors[t]}"></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════
+//  LEADERBOARD (unchanged)
+// ══════════════════════════════════════════════
+function saveLeaderboard() {
+  let board = JSON.parse(localStorage.getItem('daa_lb') || '[]');
+  const idx = board.findIndex(e => e.name === player.name);
+  const entry = {name:player.name, rating:player.rating, score:player.score, total:player.total};
+  if (idx >= 0) { if (player.rating > board[idx].rating) board[idx] = entry; }
+  else board.push(entry);
+  board.sort((a,b) => b.rating - a.rating);
+  localStorage.setItem('daa_lb', JSON.stringify(board.slice(0,20)));
+}
+
+function showLeaderboard() {
+  const board = JSON.parse(localStorage.getItem('daa_lb') || '[]');
+  const medals = ['gold','silver','bronze'];
+  const topClass = ['top1','top2','top3'];
+  const content = document.getElementById('lbContent');
+
+  if (board.length === 0) {
+    content.innerHTML = '<div class="lb-empty">No entries yet.<br>Play a game to get on the board!</div>';
+  } else {
+    content.innerHTML = board.slice(0,10).map((e,i) => {
+      const rankClass = medals[i] || 'other';
+      const rankText = i===0?'🥇':i===1?'🥈':i===2?'🥉':`#${i+1}`;
+      return `<div class="lb-row ${topClass[i]||''}">
+        <div class="lb-rank ${rankClass}">${rankText}</div>
+        <div class="lb-name">${e.name}</div>
+        <div class="lb-rating">${e.rating}</div>
+        <div class="lb-score">${e.score}/${e.total}</div>
+      </div>`;
+    }).join('');
+  }
+  showScreen('screen-lb');
+}
+
+// ══════════════════════════════════════════════
+//  UI UTILITIES
+// ══════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+let toastTimer;
+function showToast(icon, msg) {
+  const toast = document.getElementById('toast');
+  document.getElementById('toastIcon').textContent = icon;
+  document.getElementById('toastMsg').textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+}
+
+let streakTimer;
+function showStreakFlash(msg) {
+  const el = document.getElementById('streakFlash');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(streakTimer);
+  streakTimer = setTimeout(() => el.classList.remove('show'), 1600);
+}
+
+// Chip selection
+document.querySelectorAll('#qCountChips .chip').forEach(c => {
+  c.addEventListener('click', () => {
+    document.querySelectorAll('#qCountChips .chip').forEach(x => x.classList.remove('selected'));
+    c.classList.add('selected');
+  });
+});
+
+// Enter key on name input
+document.getElementById('playerName').addEventListener('keydown', e => {
+  if (e.key === 'Enter') startGame();
+});
+
+// Keyboard shortcuts for answers
+document.addEventListener('keydown', e => {
+  if (document.getElementById('screen-quiz').classList.contains('active')) {
+    const keyMap = { 'a': 0, 'b': 1, 'c': 2, 'd': 3, 'A': 0, 'B': 1, 'C': 2, 'D': 3 };
+    if (e.key in keyMap) {
+      const opt = document.getElementById(`opt${keyMap[e.key]}`);
+      if (opt && !opt.classList.contains('disabled')) opt.click();
+    }
+    if ((e.key === 'Enter' || e.key === ' ') && document.getElementById('nextBtn').classList.contains('show')) {
+      nextQuestion();
+    }
+  }
+});
+</script>
+</body>
+</html>
